@@ -1,0 +1,25 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+#步骤1
+docker run -itd \
+  -v $PWD/config.json:/root/config.json \
+  --name unicom-task \
+  --restart always \
+  srcrs/unicom-task
+#步骤2
+docker exec unicom-task /bin/bash -c 'service cron start'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
